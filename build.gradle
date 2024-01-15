@@ -47,6 +47,22 @@ application {
     mainClass.set("org.jobrunr.examples.Application")
 }
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+graalvmNative {
+    binaries {
+        all {
+            // native-build-tools reads this to find native-image unless either JAVA_HOME or GRAALVM_HOME are set:
+            //  https://github.com/graalvm/native-build-tools/blob/0.9.28/native-gradle-plugin/src/main/java/org/graalvm/buildtools/gradle/tasks/BuildNativeImageTask.java#L211
+            //  https://github.com/graalvm/native-build-tools/blob/0.9.28/native-gradle-plugin/src/main/java/org/graalvm/buildtools/gradle/internal/NativeImageExecutableLocator.java#L89
+            //  https://github.com/graalvm/native-build-tools/issues/542
+            javaLauncher.set(javaToolchains.launcherFor {
+                // Compile with native-image from GraalVM for JDK21
+                languageVersion.set(JavaLanguageVersion.of(21))
+                vendor.set(JvmVendorSpec.GRAAL_VM)
+            })
+        }
+    }
 }
